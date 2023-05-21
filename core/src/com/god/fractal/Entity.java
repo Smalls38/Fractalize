@@ -10,4 +10,5 @@ public abstract class Entity {
     public Sprite image; //the displayed sprite of the entity
     public float animationTime;
 
+
 }
