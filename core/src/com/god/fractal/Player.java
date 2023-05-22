@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 public class Player extends Entity {
     public Sprite hitbox;
     public float speed = 500;
+    public float hitBoxSize = 7f;
     public boolean invincibility = false;
     public Player(Texture img, Texture img2){
         image = new Sprite(img);
