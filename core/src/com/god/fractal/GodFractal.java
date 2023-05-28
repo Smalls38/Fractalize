@@ -19,8 +19,8 @@ import com.god.fractal.Screens.PlayScreen;
 public class GodFractal extends Game {
 	public SpriteBatch batch;
 	public float PPM = 24; //pixel per meter
-	public float VWidth = 80;
-	public float VHeight = 45;
+	public float VWidth = 1920;
+	public float VHeight = 1080;
 
 	public SnapshotArray<Entity> entities;
 

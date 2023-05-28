@@ -19,26 +19,34 @@ import com.god.fractal.GodFractal;
 import com.god.fractal.Player;
 
 public class PlayScreen implements Screen {
-    private GodFractal game;
+    public GodFractal game;
     private OrthographicCamera camera;
     private Viewport viewport;
     Player player;
     Sprite ui_bg;
-    private World world;
+    public World world;
     private Box2DDebugRenderer b2dr;
     public PlayScreen(GodFractal game){
         this.game = game;
+        world = new World(new Vector2(0,0), false); //sleep set to false since a lot of things are constantly happening
+        b2dr = new Box2DDebugRenderer();
+
 
         ui_bg = new Sprite(new Texture("ui_bg.png")); //background of the main ui
 
-        player = new Player(new Texture("player1.png"),new Texture("hitbox.png") ); //new instance of player
+
+
+        player = new Player(new Texture("player1.png"),new Texture("hitbox.png"), this); //new instance of player
+
 
         camera = new OrthographicCamera(); //fixed camera
+        camera.setToOrtho(false, game.VWidth/game.PPM,  game.VHeight/game.PPM);
 
-        viewport = new FitViewport(game.VWidth*game.PPM ,game.VHeight*game.PPM, camera); //a viewport with a fixed aspect ratio
+        viewport = new FitViewport(game.VWidth/game.PPM ,game.VHeight/game.PPM, camera); //a viewport with a fixed aspect ratio
 
-        world = new World(new Vector2(0,0), false); //sleep set to false since a lot of things are constantly happening
-        b2dr = new Box2DDebugRenderer();
+        camera.position.set(viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2, 0);
+
+        game.batch.setProjectionMatrix(camera.combined);
 
     }
     @Override
@@ -50,16 +58,25 @@ public class PlayScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        //camera.update();
+
         game.batch.begin();
+
         player.Draw(game.batch);
 
-        game.batch.draw(ui_bg, 0, 0);
+
+        game.batch.draw(ui_bg, 0, 0, game.VWidth/game.PPM, game.VHeight/game.PPM );
         game.batch.end();
+
+        b2dr.render(world, camera.combined);
+
 
     }
 
     @Override
     public void resize(int width, int height) {
+
         viewport.update(width, height); //updates the actual size of the window so nothing can be stretched
     }
 
