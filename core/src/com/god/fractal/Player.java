@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 
 public class Player extends Entity {
     public Sprite hitbox;
@@ -16,6 +17,8 @@ public class Player extends Entity {
         image = new Sprite(img);
         hitbox = new Sprite(img2);
         position = new Vector2(Gdx.graphics.getWidth()/2,0);
+        def = new BodyDef();
+        //def.type = BodyDef.BodyType.DynamicBody();
     }
     public void Update(float deltaTime){
         if(Gdx.input.isKeyPressed(Input.Keys.W)){

@@ -1,6 +1,8 @@
 package com.god.fractal;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -16,7 +18,9 @@ import com.god.fractal.Screens.PlayScreen;
 
 public class GodFractal extends Game {
 	public SpriteBatch batch;
-
+	public float PPM = 24; //pixel per meter
+	public float VWidth = 80;
+	public float VHeight = 45;
 
 	public SnapshotArray<Entity> entities;
 
@@ -33,7 +37,9 @@ public class GodFractal extends Game {
 	@Override
 	public void render () {
 		ScreenUtils.clear(0, 0, 0, 1);
-
+		if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
+			System.out.println("mouse at " + Gdx.input.getX() + " " + Gdx.input.getY() );
+		}
 		super.render();
 //		batch.begin();
 
