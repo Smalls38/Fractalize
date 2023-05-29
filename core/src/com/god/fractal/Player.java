@@ -16,7 +16,7 @@ public class Player extends Entity {
     public Vector2 hitboxSize; //size of hitbox sprite
     public Vector2 velocity;
     public float hitboxRadius = 6; //radius of hitbox
-    public float maxSpeed = 15; //max speed of player and hitbox
+    public float maxSpeed = 18; //max speed of player and hitbox
     public float speed = 0; //speed of player
     public float health = 100; //health of player
     public boolean invincibility = false; //when player is not affacted by any collisions

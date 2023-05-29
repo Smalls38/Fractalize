@@ -49,19 +49,7 @@ public class PlayScreen implements Screen {
 
         game.batch.setProjectionMatrix(camera.combined);
 
-        //ui collisions
-        Body body;
-        BodyDef bdef = new BodyDef();
-        FixtureDef fdef = new FixtureDef();
-        PolygonShape shape = new PolygonShape();
-
-        bdef.type = BodyDef.BodyType.StaticBody;
-        bdef.position.set(0,0);
-
-        shape.setAsBox(222/PPM,1080/PPM);
-        fdef.shape = shape;
-        body = world.createBody(bdef);
-        body.createFixture(fdef);
+        UiCollisions();
 
 
 
@@ -118,6 +106,46 @@ public class PlayScreen implements Screen {
     public void dispose() {
         world.dispose();
         b2dr.dispose();
+
+    }
+    public void UiCollisions(){
+        //ui collisions
+        Body body;
+        BodyDef bdef = new BodyDef();
+        FixtureDef fdef = new FixtureDef();
+        PolygonShape shape = new PolygonShape();
+
+        //fdef.filter.categoryBits = WORLD_UI;
+        bdef.type = BodyDef.BodyType.StaticBody;
+
+        //left
+        bdef.position.set(111/PPM,540/PPM);
+        shape.setAsBox(111/PPM,540/PPM);
+        fdef.shape = shape;
+        body = world.createBody(bdef);
+        body.createFixture(fdef);
+
+
+        //top
+        bdef.position.set(659/PPM,1071/PPM);
+        shape.setAsBox(1096/PPM,9/PPM);
+        fdef.shape = shape;
+        body = world.createBody(bdef);
+        body.createFixture(fdef);
+
+        //right
+        bdef.position.set(1508/PPM,540/PPM);
+        shape.setAsBox(412/PPM,540/PPM);
+        fdef.shape = shape;
+        body = world.createBody(bdef);
+        body.createFixture(fdef);
+
+        //bottom
+        bdef.position.set(659/PPM,9/PPM);
+        shape.setAsBox(1096/PPM,9/PPM);
+        fdef.shape = shape;
+        body = world.createBody(bdef);
+        body.createFixture(fdef);;
 
     }
 }
