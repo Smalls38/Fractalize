@@ -27,6 +27,7 @@ public class PlayScreen implements Screen {
     public World world;
     private Box2DDebugRenderer b2dr;
     public float PPM;
+    public short WORLD_UI = 0x0001;
     public PlayScreen(GodFractal game){
         this.game = game;
         world = new World(new Vector2(0,0), false); //sleep set to false since a lot of things are constantly happening
@@ -113,9 +114,10 @@ public class PlayScreen implements Screen {
         Body body;
         BodyDef bdef = new BodyDef();
         FixtureDef fdef = new FixtureDef();
+        fdef.filter.maskBits = 0x0002;
         PolygonShape shape = new PolygonShape();
 
-        //fdef.filter.categoryBits = WORLD_UI;
+        fdef.filter.categoryBits = WORLD_UI;
         bdef.type = BodyDef.BodyType.StaticBody;
 
         //left
