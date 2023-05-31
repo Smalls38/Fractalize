@@ -15,19 +15,21 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 //import com.dongbat.jbump.Item;
 //import com.dongbat.jbump.Rect;
 //import com.dongbat.jbump.World;
+import com.god.fractal.Cooldown;
 import com.god.fractal.GodFractal;
 import com.god.fractal.Player;
 
 public class PlayScreen implements Screen {
     public GodFractal game;
     private OrthographicCamera camera;
-    private Viewport viewport;
+    public Viewport viewport;
     Player player;
     Sprite ui_bg;
     public World world;
     private Box2DDebugRenderer b2dr;
     public float PPM;
     public short WORLD_UI = 0x0001;
+
     public PlayScreen(GodFractal game){
         this.game = game;
         world = new World(new Vector2(0,0), false); //sleep set to false since a lot of things are constantly happening
@@ -75,7 +77,7 @@ public class PlayScreen implements Screen {
         game.batch.draw(ui_bg, 0, 0, game.VWidth/game.PPM, game.VHeight/game.PPM );
         game.batch.end();
 
-        b2dr.render(world, camera.combined);
+        //b2dr.render(world, camera.combined);
 
 
     }
