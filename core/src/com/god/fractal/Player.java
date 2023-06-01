@@ -92,7 +92,7 @@ public class Player extends Entity {
             velocity.x += 1;
         }
         if(Gdx.input.isKeyPressed(Input.Keys.J) && cooldowns.isOver(0)){
-            bullets.add(swordPhantoms.makeBullet(body.getPosition(), screen, bulletVelocity));
+            bullets.add(swordPhantoms.makeBullet(new Vector2(body.getPosition().x, body.getPosition().y + imageSize.y  ), screen, bulletVelocity));
         }
         if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
             focus = true;
@@ -106,23 +106,7 @@ public class Player extends Entity {
     public void Draw(SpriteBatch batch){
         Update(Gdx.graphics.getDeltaTime());
 
-        Array<Body> bodies = new Array<Body>();
-        // Now fill the array with all bodies
-        screen.world.getBodies(bodies);
-
-        for (Body b : bodies) {
-            // Get the body's user data - in this example, our user
-            // data is an instance of the Entity class
-            Sprite sprite = (Sprite) b.getUserData();
-            if (b.getPosition().y > screen.viewport.getWorldHeight() * 2){
-                screen.world.destroyBody(b);
-            }
-            if (sprite != null) {
-                batch.draw(sprite, b.getPosition().x-swordPhantoms.imageSize.x/2, b.getPosition().y-swordPhantoms.imageSize.y/2,
-                        swordPhantoms.imageSize.x, swordPhantoms.imageSize.y);
-            }
-        }
-
+        clean(batch);
         batch.draw(image, body.getPosition().x-imageSize.x/2, body.getPosition().y-imageSize.y/2, imageSize.x, imageSize.y);
 
         if (focus) {
@@ -131,6 +115,23 @@ public class Player extends Entity {
     }
     public void initializeBullet(){
         swordPhantoms = new PlayerBullet(ENEMY_WORLD, PLAYER_BULLETS, BodyDef.BodyType.KinematicBody, new Sprite(swordTexture),new Vector2(swordTexture.getWidth()/PPM, swordTexture.getHeight()/PPM));
+    }
+    public void clean(SpriteBatch batch){
+        Array<Body> bodies = new Array<>();
+        // Now fill the array with all bodies
+        screen.world.getBodies(bodies);
+
+        for (Body b : bodies) {
+            Sprite sprite = (Sprite) b.getUserData();
+            if (b.getPosition().y > screen.viewport.getWorldHeight() * 1.2){
+                screen.world.destroyBody(b);
+            }
+            if (sprite != null) {
+                batch.draw(sprite, b.getPosition().x-swordPhantoms.imageSize.x/2, b.getPosition().y-swordPhantoms.imageSize.y/2,
+                        swordPhantoms.imageSize.x, swordPhantoms.imageSize.y);
+            }
+        }
+
     }
 
 }
