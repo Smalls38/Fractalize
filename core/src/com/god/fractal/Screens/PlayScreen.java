@@ -2,6 +2,7 @@ package com.god.fractal.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,14 +13,16 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-//import com.dongbat.jbump.Item;
-//import com.dongbat.jbump.Rect;
-//import com.dongbat.jbump.World;
+import com.badlogic.gdx.video.VideoPlayer;
+import com.badlogic.gdx.video.VideoPlayerCreator;
 import com.god.fractal.Cooldown;
 import com.god.fractal.GodFractal;
 import com.god.fractal.Player;
 
+import java.io.FileNotFoundException;
+
 public class PlayScreen implements Screen {
+    private VideoPlayer videoPlayer;
     public GodFractal game;
     private OrthographicCamera camera;
     public Viewport viewport;
@@ -34,8 +37,22 @@ public class PlayScreen implements Screen {
         this.game = game;
         world = new World(new Vector2(0,0), false); //sleep set to false since a lot of things are constantly happening
         b2dr = new Box2DDebugRenderer();
-
-
+        videoPlayer = VideoPlayerCreator.createVideoPlayer();
+        videoPlayer.setOnCompletionListener(new VideoPlayer.CompletionListener() {
+            @Override
+            public void onCompletionListener(FileHandle file) {
+                try {
+                    videoPlayer.play(Gdx.files.internal("fractal.webm"));
+                } catch (FileNotFoundException e) {
+                    Gdx.app.error("gdx-video", "vid not found");
+                }
+            }
+        });
+        try {
+            videoPlayer.play(Gdx.files.internal("fractal.webm"));
+        } catch (FileNotFoundException e) {
+            Gdx.app.error("gdx-video", "vid not found");
+        }
         ui_bg = new Sprite(new Texture("ui_bg.png")); //background of the main ui
 
         PPM = game.PPM;
@@ -68,25 +85,29 @@ public class PlayScreen implements Screen {
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        videoPlayer.update();
         //camera.update();
         update(delta);
         game.batch.begin();
-        player.Draw(game.batch);
+        Texture videoFrame = videoPlayer.getTexture();
+        if (videoFrame != null){
+            game.batch.draw(videoFrame,0,0,videoFrame.getWidth()*1.5f/PPM, videoFrame.getHeight()*1.5f/PPM);
+        }
+        player.Draw(game.batch, delta);
 
 
         game.batch.draw(ui_bg, 0, 0, game.VWidth/game.PPM, game.VHeight/game.PPM );
         game.batch.end();
 
-        //b2dr.render(world, camera.combined);
+        b2dr.render(world, camera.combined);
 
 
     }
     public void update(float delta){
-        world.step(delta, 6, 2);
+        world.step(delta, 18, 18); //step the physics simulation
     }
     @Override
     public void resize(int width, int height) {
-
         viewport.update(width, height); //updates the actual size of the window so nothing can be stretched
     }
 

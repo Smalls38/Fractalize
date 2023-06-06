@@ -25,7 +25,6 @@ public class Cooldown {
     public void update(float delta){
         for (int i = 0; i < timers.length; i++) {
             timers[i] = timers[i]-delta;
-            System.out.println("timw is now " + timers[i]);
         }
     }
 }

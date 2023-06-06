@@ -20,12 +20,15 @@ public class Player extends Entity {
     public Vector2 hitboxSize; //size of hitbox sprite
     public Vector2 velocity;
     public PlayerBullet  swordPhantoms;
-    public float bulletVelocity = 138;
+    public float bulletVelocity_swordPhantoms = 138;
+    public PlayerBullet  blossoms;
+    public float bulletVelocity_blossoms = 38;
     public PlayerBullet focusSlash;
     public float hitboxRadius = 6; //radius of hitbox
     public float maxSpeed = 18; //max speed of player and hitbox
     public float speed = 0; //speed of player
     public float health = 100; //health of player
+    public float power = 0; //power of player, more bullets will exist if player has higher power
     public boolean invincibility = false; //when player is not affacted by any collisions
     public boolean dead = false; //when player is dead
     public boolean focus = false;
@@ -37,7 +40,10 @@ public class Player extends Entity {
     public short PLAYER_BULLETS = 0x0003;
     public short ENEMY_WORLD = 0x0004;
     Texture swordTexture = new Texture("swordPhantom.png");
-    public Cooldown cooldowns = new Cooldown(new float[]{0.05f});
+    Texture blossomTexture = new Texture("blossom.png");
+    public float bulletCooldown = 0.05f;
+    public float powerGainCooldown = 0.5f;
+    public Cooldown cooldowns = new Cooldown(new float[]{bulletCooldown, powerGainCooldown});
 
     public Player(Texture img, Texture img2, PlayScreen screen){
         image = new Sprite(img);
@@ -73,12 +79,14 @@ public class Player extends Entity {
         body.createFixture(fdef);
         circle.dispose();
 
-
         initializeBullet();
     }
-    public void Update(float deltaTime){
-        cooldowns.update(deltaTime);
+    public void Update(float delta){
+        cooldowns.update(delta);
         velocity = new Vector2(0,0);
+        if (cooldowns.isOver(1) && power <= 3){
+            power += 0.1;
+        }
         if(Gdx.input.isKeyPressed(Input.Keys.W)){
             velocity.y += 1;
         }
@@ -92,7 +100,18 @@ public class Player extends Entity {
             velocity.x += 1;
         }
         if(Gdx.input.isKeyPressed(Input.Keys.J) && cooldowns.isOver(0)){
-            bullets.add(swordPhantoms.makeBullet(new Vector2(body.getPosition().x, body.getPosition().y + imageSize.y  ), screen, bulletVelocity));
+            if (power >= 1){
+                bullets.add(blossoms.makeBullet(new Vector2(body.getPosition().x, body.getPosition().y + imageSize.y), screen, new Vector2(0, bulletVelocity_blossoms)));
+            }
+            if (power >= 2){
+                bullets.add(blossoms.makeBullet(new Vector2(body.getPosition().x + imageSize.x, body.getPosition().y + imageSize.y  ), screen, new Vector2(bulletVelocity_blossoms/2, bulletVelocity_blossoms)));
+                bullets.add(blossoms.makeBullet(new Vector2(body.getPosition().x - imageSize.x, body.getPosition().y + imageSize.y  ), screen, new Vector2(-bulletVelocity_blossoms/2, bulletVelocity_blossoms)));
+            }
+            if (power >= 3){
+                bullets.add(blossoms.makeBullet(new Vector2(body.getPosition().x + imageSize.x, body.getPosition().y - imageSize.y  ), screen, new Vector2(bulletVelocity_blossoms, bulletVelocity_blossoms)));
+                bullets.add(blossoms.makeBullet(new Vector2(body.getPosition().x - imageSize.x, body.getPosition().y - imageSize.y  ), screen, new Vector2(-bulletVelocity_blossoms, bulletVelocity_blossoms)));
+            }
+            bullets.add(swordPhantoms.makeBullet(new Vector2(body.getPosition().x, body.getPosition().y + imageSize.y  ), screen, bulletVelocity_swordPhantoms));
         }
         if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
             focus = true;
@@ -103,8 +122,8 @@ public class Player extends Entity {
         }
         body.setLinearVelocity(speed*velocity.x, speed*velocity.y);
     }
-    public void Draw(SpriteBatch batch){
-        Update(Gdx.graphics.getDeltaTime());
+    public void Draw(SpriteBatch batch, float delta){
+        Update(delta);
 
         clean(batch);
         batch.draw(image, body.getPosition().x-imageSize.x/2, body.getPosition().y-imageSize.y/2, imageSize.x, imageSize.y);
@@ -114,7 +133,9 @@ public class Player extends Entity {
         }
     }
     public void initializeBullet(){
-        swordPhantoms = new PlayerBullet(ENEMY_WORLD, PLAYER_BULLETS, BodyDef.BodyType.KinematicBody, new Sprite(swordTexture),new Vector2(swordTexture.getWidth()/PPM, swordTexture.getHeight()/PPM));
+        swordPhantoms = new PlayerBullet(ENEMY_WORLD, PLAYER_BULLETS, BodyDef.BodyType.KinematicBody, new Sprite(swordTexture),new Vector2(swordTexture.getWidth()/PPM, swordTexture.getHeight()/PPM), 50, 100);
+        blossoms = new PlayerBullet(ENEMY_WORLD, PLAYER_BULLETS, BodyDef.BodyType.KinematicBody, new Sprite(blossomTexture),new Vector2(blossomTexture.getWidth()/PPM, blossomTexture.getHeight()/PPM), 25, 150);
+        System.out.println(blossomTexture.getHeight()/PPM);
     }
     public void clean(SpriteBatch batch){
         Array<Body> bodies = new Array<>();
@@ -127,8 +148,8 @@ public class Player extends Entity {
                 screen.world.destroyBody(b);
             }
             if (sprite != null) {
-                batch.draw(sprite, b.getPosition().x-swordPhantoms.imageSize.x/2, b.getPosition().y-swordPhantoms.imageSize.y/2,
-                        swordPhantoms.imageSize.x, swordPhantoms.imageSize.y);
+                batch.draw(sprite, b.getPosition().x-sprite.getWidth()/2/PPM, b.getPosition().y-sprite.getHeight()/2/PPM,
+                        sprite.getWidth()/PPM, sprite.getHeight()/PPM);
             }
         }
 

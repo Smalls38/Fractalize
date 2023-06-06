@@ -1,5 +1,5 @@
 package com.god.fractal;
 
-public class EnemyConstruct extends Entity{
+public class EnemyConstruct extends Entity implements Enemy{
 
 }
