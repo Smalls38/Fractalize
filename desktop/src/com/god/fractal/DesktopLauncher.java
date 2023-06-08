@@ -11,7 +11,7 @@ public class DesktopLauncher {
 		config.useVsync(false);
 		config.setForegroundFPS(6000);
 		config.setTitle("Fractalize");
-		config.setWindowedMode(2400,1300);
+		config.setWindowedMode(1600,900);
 		new Lwjgl3Application(new GodFractal(), config);
 	}
 }

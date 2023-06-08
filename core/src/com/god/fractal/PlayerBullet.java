@@ -30,6 +30,7 @@ public class PlayerBullet extends Bullet {
         fdef.filter.maskBits = enemy;
         fdef.shape = shape;
 
+
     }
     public PlayerBullet makeBullet(Vector2 position, PlayScreen screen, float speed){
         gdef.position.set(position);

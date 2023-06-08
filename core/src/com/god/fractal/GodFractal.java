@@ -38,7 +38,9 @@ public class GodFractal extends Game {
 	public void render () {
 		ScreenUtils.clear(0, 0, 0, 1);
 		if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
-			System.out.println("mouse at " + Gdx.input.getX() + " " + Gdx.input.getY() );
+			System.out.print(Gdx.input.getX()/PPM + " " + Gdx.input.getY()/PPM + ",");
+		} else if (Gdx.input.isKeyJustPressed(Input.Keys.N)){
+			System.out.println();
 		}
 		super.render();
 //		batch.begin();

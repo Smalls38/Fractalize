@@ -27,7 +27,6 @@ public class Player extends Entity {
     public float hitboxRadius = 6; //radius of hitbox
     public float maxSpeed = 18; //max speed of player and hitbox
     public float speed = 0; //speed of player
-    public float health = 100; //health of player
     public float power = 0; //power of player, more bullets will exist if player has higher power
     public boolean invincibility = false; //when player is not affacted by any collisions
     public boolean dead = false; //when player is dead
@@ -48,6 +47,7 @@ public class Player extends Entity {
     public Player(Texture img, Texture img2, PlayScreen screen){
         image = new Sprite(img);
         hitbox = new Sprite(img2);
+        health = 100;
 
         this.screen = screen;
         PPM = screen.game.PPM;
@@ -143,6 +143,7 @@ public class Player extends Entity {
         screen.world.getBodies(bodies);
 
         for (Body b : bodies) {
+            System.out.println();
             Sprite sprite = (Sprite) b.getUserData();
             if (b.getPosition().y > screen.viewport.getWorldHeight() * 1.2){
                 screen.world.destroyBody(b);

@@ -14,6 +14,6 @@ public abstract class Entity {
     public Body body; //
     public BodyDef gdef; //type of body
     public FixtureDef fdef;
-
+    public float health ; //health of object
 
 }
