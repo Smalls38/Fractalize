@@ -1,4 +1,4 @@
-package com.god.fractal;
+package Entities;
 
 import com.badlogic.gdx.math.CatmullRomSpline;
 import com.badlogic.gdx.math.Vector2;

@@ -1,5 +1,7 @@
 package com.god.fractal;
 
+import Entities.Enemy;
+
 import java.util.ArrayList;
 
 public class Timeline {

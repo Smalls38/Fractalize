@@ -1,4 +1,4 @@
-package com.god.fractal;
+package Entities;
 
 public class EnemyBullet {
 }
