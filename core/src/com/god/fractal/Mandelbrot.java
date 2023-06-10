@@ -19,7 +19,6 @@ public class Mandelbrot {
     }
     public void calculate(ComplexNum z, ComplexNum z0, ArrayList<Vector2> points){
         if (steps != maxIterations && z0.abs() < 5) {
-            System.out.println("right now the imaginary is " + z0.imagine);
             steps++;
             z = z.times(z);
             z = z.plus(z0);
