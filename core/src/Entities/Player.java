@@ -5,13 +5,16 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.CatmullRomSpline;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.utils.Array;
+import com.god.fractal.ComplexNum;
 import com.god.fractal.Cooldown;
+import com.god.fractal.Mandelbrot;
 import com.god.fractal.Screens.PlayScreen;
 import com.god.fractal.BodyData;
 
@@ -25,7 +28,7 @@ public class Player extends Entity {
     public float bulletVelocity_swordPhantoms = 138;
     public PlayerBullet blossoms;
     public float bulletVelocity_blossoms = 38;
-    public PlayerBullet focusSlash;
+    public PlayerBullet mandellingbrots;
     public float hitboxRadius = 6; //radius of hitbox
     public float maxSpeed = 18; //max speed of player and hitbox
     public float speed = 0; //speed of player
@@ -38,15 +41,18 @@ public class Player extends Entity {
     public PlayScreen screen;
     public float PPM;
     public short PLAYER_WORLD = 0x0002;
-    public short PLAYER_BULLETS = 0x0003;
-    public short ENEMY_WORLD = 0x0004;
-    public float bulletCooldown = 0.05f;
+    public short PLAYER_BULLETS = 0x0004;
+    public short ENEMY_WORLD = 0x0008;
+    public float unfocusBulletCooldown = 0.05f;
+    public float focusBulletCooldown = 0.15f;
     public float powerGainCooldown = 0.5f;
-    public Cooldown cooldowns = new Cooldown(new float[]{bulletCooldown, powerGainCooldown});
+    public Cooldown cooldowns = new Cooldown(new float[]{unfocusBulletCooldown, powerGainCooldown, focusBulletCooldown});
     Texture swordTexture = new Texture("swordPhantom.png");
     Texture blossomTexture = new Texture("blossom.png");
+    Texture mandelTexture = new Texture("fractalBullet.png");
+    Mandelbrot brot;
 
-    public Player(Texture img, Texture img2, PlayScreen screen) {
+    public Player(Texture img, Texture img2, PlayScreen screen, short WORLD_UI) {
         image = new Sprite(img);
         hitbox = new Sprite(img2);
         health = 100;
@@ -76,12 +82,18 @@ public class Player extends Entity {
 
         fdef = new FixtureDef();
         fdef.filter.categoryBits = PLAYER_WORLD;
-        fdef.filter.maskBits = 0x0001;
+        fdef.filter.maskBits = (short) (ENEMY_WORLD | WORLD_UI); // what bodies it will collide with
         fdef.shape = circle;
         body.createFixture(fdef);
-        circle.dispose();
+        circle.dispose(); //removing the circle from memory
 
         initializeBullet();
+
+        brot = new Mandelbrot(50, 0.5f, 0.5f, 874/PPM, 1044/PPM, new Vector2(222/PPM, 18/PPM), new Vector2(-1.5f, -1.1f));
+        Vector2[] test = brot.mandlePoints(new ComplexNum(4.0625,4.0625));
+        for (int i = 0; i < test.length; i++) {
+            System.out.println(test[i].x + " " + test[i].y);
+        }
     }
 
     public void Update(float delta) {
@@ -103,22 +115,30 @@ public class Player extends Entity {
             velocity.x += 1;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.J) && cooldowns.isOver(0)) {
-            if (power >= 1) {
-                bullets.add(blossoms.makeBullet(new Vector2(body.getPosition().x, body.getPosition().y + imageSize.y), screen, new Vector2(0, bulletVelocity_blossoms)));
+            if (!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                if (power >= 1) {
+                    blossoms.makeBullet(new Vector2(body.getPosition().x, body.getPosition().y + imageSize.y), screen, new Vector2(0, bulletVelocity_blossoms));
+                }
+                if (power >= 2) {
+                    blossoms.makeBullet(new Vector2(body.getPosition().x + imageSize.x, body.getPosition().y + imageSize.y), screen, new Vector2(bulletVelocity_blossoms / 2, bulletVelocity_blossoms));
+                    blossoms.makeBullet(new Vector2(body.getPosition().x - imageSize.x, body.getPosition().y + imageSize.y), screen, new Vector2(-bulletVelocity_blossoms / 2, bulletVelocity_blossoms));
+                }
+                if (power >= 3) {
+                    blossoms.makeBullet(new Vector2(body.getPosition().x + imageSize.x, body.getPosition().y - imageSize.y), screen, new Vector2(bulletVelocity_blossoms, bulletVelocity_blossoms));
+                    blossoms.makeBullet(new Vector2(body.getPosition().x - imageSize.x, body.getPosition().y - imageSize.y), screen, new Vector2(-bulletVelocity_blossoms, bulletVelocity_blossoms));
+                }
             }
-            if (power >= 2) {
-                bullets.add(blossoms.makeBullet(new Vector2(body.getPosition().x + imageSize.x, body.getPosition().y + imageSize.y), screen, new Vector2(bulletVelocity_blossoms / 2, bulletVelocity_blossoms)));
-                bullets.add(blossoms.makeBullet(new Vector2(body.getPosition().x - imageSize.x, body.getPosition().y + imageSize.y), screen, new Vector2(-bulletVelocity_blossoms / 2, bulletVelocity_blossoms)));
-            }
-            if (power >= 3) {
-                bullets.add(blossoms.makeBullet(new Vector2(body.getPosition().x + imageSize.x, body.getPosition().y - imageSize.y), screen, new Vector2(bulletVelocity_blossoms, bulletVelocity_blossoms)));
-                bullets.add(blossoms.makeBullet(new Vector2(body.getPosition().x - imageSize.x, body.getPosition().y - imageSize.y), screen, new Vector2(-bulletVelocity_blossoms, bulletVelocity_blossoms)));
-            }
-            bullets.add(swordPhantoms.makeBullet(new Vector2(body.getPosition().x, body.getPosition().y + imageSize.y), screen, bulletVelocity_swordPhantoms));
+            swordPhantoms.makeBullet(new Vector2(body.getPosition().x, body.getPosition().y + imageSize.y), screen, bulletVelocity_swordPhantoms);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
             focus = true;
             speed = maxSpeed / 2;
+            if (Gdx.input.isKeyPressed(Input.Keys.J)&& cooldowns.isOver(2)){
+                mandellingbrots.makeFractalBullet(screen, new CatmullRomSpline<>(brot.mandlePoints(new ComplexNum(body.getPosition().x, body.getPosition().y)), true), 0.2f);
+                for (int i = 0; i < (int) power; i++) {
+                    mandellingbrots.makeFractalBullet(screen, new CatmullRomSpline<>(brot.mandlePoints(new ComplexNum(Math.random()*10-5, Math.random()*10-5)), true), 0.1f);
+                }
+            }
         } else {
             focus = false;
             speed = maxSpeed;
@@ -129,7 +149,7 @@ public class Player extends Entity {
     public void Draw(SpriteBatch batch, float delta) {
         Update(delta);
 
-        clean(batch);
+        //System.out.println("player is at " + body.getPosition().y + "," + body.getPosition().y);
         batch.draw(image, body.getPosition().x - imageSize.x / 2, body.getPosition().y - imageSize.y / 2, imageSize.x, imageSize.y);
 
         if (focus) {
@@ -140,33 +160,8 @@ public class Player extends Entity {
     public void initializeBullet() {
         swordPhantoms = new PlayerBullet(ENEMY_WORLD, PLAYER_BULLETS, BodyDef.BodyType.KinematicBody, new Sprite(swordTexture), new Vector2(swordTexture.getWidth() / PPM, swordTexture.getHeight() / PPM), 50, 100);
         blossoms = new PlayerBullet(ENEMY_WORLD, PLAYER_BULLETS, BodyDef.BodyType.KinematicBody, new Sprite(blossomTexture), new Vector2(blossomTexture.getWidth() / PPM, blossomTexture.getHeight() / PPM), 25, 150);
-        System.out.println(blossomTexture.getHeight() / PPM);
+        mandellingbrots = new PlayerBullet(ENEMY_WORLD, PLAYER_BULLETS, BodyDef.BodyType.KinematicBody, new Sprite(mandelTexture), new Vector2(mandelTexture.getWidth() / PPM, mandelTexture.getHeight() / PPM), 10, 50);
     }
 
-    public void clean(SpriteBatch batch) {
-        Array<Body> bodies = new Array<>();
-        // Now fill the array with all bodies
-        screen.world.getBodies(bodies);
-
-        for (Body b : bodies) {
-            Sprite toDraw;
-            BodyData data = (BodyData) b.getUserData();
-            if (b.getPosition().y > screen.viewport.getWorldHeight() * 1.2 || b.getPosition().x < 0) {
-                screen.world.destroyBody(b);
-            }
-            if (data != null) {
-                if (data.getType().equals("player")) {
-                    toDraw = data.getTexture();
-                    batch.draw(toDraw, b.getPosition().x - toDraw.getWidth() / 2 / PPM, b.getPosition().y - toDraw.getHeight() / 2 / PPM,
-                            toDraw.getWidth() / PPM, toDraw.getHeight() / PPM);
-                }
-//            if (type != null) {
-//                batch.draw(sprite, b.getPosition().x-sprite.getWidth()/2/PPM, b.getPosition().y-sprite.getHeight()/2/PPM,
-//                        sprite.getWidth()/PPM, sprite.getHeight()/PPM);
-//            }
-            }
-        }
-
-    }
 
 }

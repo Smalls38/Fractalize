@@ -1,6 +1,7 @@
 package Entities;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.CatmullRomSpline;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -29,20 +30,27 @@ public class PlayerBullet extends Bullet {
 
 
     }
-    public PlayerBullet makeBullet(Vector2 position, PlayScreen screen, float speed){
+    public void makeBullet(Vector2 position, PlayScreen screen, float speed){
         gdef.position.set(position);
         body = screen.world.createBody(gdef);
-        body.setUserData(new BodyData("player", image));
+        body.setUserData(new BodyData("unfocusBullet", image));
         body.createFixture(fdef);
         body.setLinearVelocity(0,speed);
-        return this;
     }
-    public PlayerBullet makeBullet(Vector2 position, PlayScreen screen, Vector2 speed){
+    public void makeBullet(Vector2 position, PlayScreen screen, Vector2 speed){
         gdef.position.set(position);
         body = screen.world.createBody(gdef);
-        body.setUserData(new BodyData("player", image));
+        body.setUserData(new BodyData("unfocusBullet", image));
         body.createFixture(fdef);
         body.setLinearVelocity(speed.x,speed.y);
-        return this;
+    }
+    public void makeFractalBullet(PlayScreen screen, CatmullRomSpline<Vector2> path, float speed){
+        Vector2 initialPosition = new Vector2();
+        path.valueAt(initialPosition, 0);
+        gdef.position.set(initialPosition);
+        body = screen.world.createBody(gdef);
+        body.setUserData(new BodyData("focusBullet", image, path, speed));
+        body.createFixture(fdef);
+
     }
 }
