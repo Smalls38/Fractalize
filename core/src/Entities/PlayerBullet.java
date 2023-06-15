@@ -9,7 +9,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.god.fractal.Screens.PlayScreen;
 import com.god.fractal.BodyData;
 
-public class PlayerBullet extends Bullet {
+public class PlayerBullet extends Bullet implements Projectile{
     public PlayerBullet(short enemy, short collisionLayer, BodyDef.BodyType type, Sprite img, Vector2 spriteSize, float damage, float lifetime){
         this.dmg = damage;
         this.lifeTime =  lifetime;
@@ -27,8 +27,6 @@ public class PlayerBullet extends Bullet {
 
         fdef.filter.maskBits = enemy;
         fdef.shape = shape;
-
-
     }
     public void makeBullet(Vector2 position, PlayScreen screen, float speed){
         gdef.position.set(position);

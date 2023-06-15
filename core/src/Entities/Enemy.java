@@ -8,4 +8,5 @@ public abstract class Enemy extends Entity{
         Vector2 out;
         float speed;
         float current;
+        String name;
 }

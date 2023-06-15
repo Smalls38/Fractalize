@@ -35,6 +35,7 @@ public class PlayScreen implements Screen {
     private Box2DDebugRenderer b2dr; //renderer that shows the bounding box of all bodies
     public float PPM; // Pixel Per Meter
     public short WORLD_UI = 0x0001; //the bit for which layer that the UI is located on
+    public short ENEMY_WORLD = 0x0008;
     public Timeline timeline;
 
     public PlayScreen(GodFractal game) throws IOException {
@@ -75,7 +76,7 @@ public class PlayScreen implements Screen {
 
         UiCollisions(); //initialize the boundaries of the UI
 
-        timeline = new Timeline();
+        timeline = new Timeline(this, ENEMY_WORLD);
 
     }
 

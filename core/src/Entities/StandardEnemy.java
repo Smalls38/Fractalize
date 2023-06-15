@@ -6,16 +6,18 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.god.fractal.BodyData;
+import com.god.fractal.Screens.PlayScreen;
 
-public class EnemyConstruct extends Enemy{
+public class StandardEnemy extends Enemy {
 
-    public EnemyConstruct(short enemy, short collisionLayer, BodyDef.BodyType type, Sprite img, Vector2[] dataSet, float speed, Vector2 spriteSize){
+    public StandardEnemy(short enemy, short collisionLayer, BodyDef.BodyType type, Sprite img, Vector2[] dataSet, float speed, Vector2 spriteSize) {
         CatmullRomSpline<Vector2> myCatmull = new CatmullRomSpline<Vector2>(dataSet, true);
-        Vector2 out = new Vector2();
+        out = new Vector2();
         this.speed = speed;
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(spriteSize.x/2, spriteSize.y/2);
+        shape.setAsBox(spriteSize.x / 2, spriteSize.y / 2);
 
         gdef = new BodyDef();
         fdef = new FixtureDef();
@@ -27,5 +29,13 @@ public class EnemyConstruct extends Enemy{
 
         fdef.filter.maskBits = enemy;
         fdef.shape = shape;
+    }
+    public void makeEnemy(Vector2 position, PlayScreen screen, float speed, CatmullRomSpline path) {
+        Vector2 initialPosition = new Vector2();
+        path.valueAt(initialPosition, 0);
+        gdef.position.set(initialPosition);
+        body = screen.world.createBody(gdef);
+        body.setUserData(new BodyData("StandardEnemy", image, path, speed));
+        body.createFixture(fdef);
     }
 }

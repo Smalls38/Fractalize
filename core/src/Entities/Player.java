@@ -42,7 +42,6 @@ public class Player extends Entity {
     public float PPM;
     public short PLAYER_WORLD = 0x0002;
     public short PLAYER_BULLETS = 0x0004;
-    public short ENEMY_WORLD = 0x0008;
     public float unfocusBulletCooldown = 0.05f;
     public float focusBulletCooldown = 0.15f;
     public float powerGainCooldown = 0.5f;
