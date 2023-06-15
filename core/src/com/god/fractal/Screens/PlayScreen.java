@@ -15,43 +15,45 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.video.VideoPlayer;
 import com.badlogic.gdx.video.VideoPlayerCreator;
-import com.god.fractal.BodyData;
-import com.god.fractal.ComplexNum;
-import com.god.fractal.GodFractal;
-import com.god.fractal.Mandelbrot;
+import com.god.fractal.*;
 
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
-
+/**
+ * this is the class that handles the screen for all gameplay
+ */
 public class PlayScreen implements Screen {
-    private VideoPlayer videoPlayer;
-    public GodFractal game;
+    private VideoPlayer videoPlayer; //video player for the background
+    public GodFractal game; //the game itself, to access the constants and sprite batch
     private OrthographicCamera camera;
     public Viewport viewport;
-    Player player;
-    Sprite ui_bg;
-    public World world;
-    private Box2DDebugRenderer b2dr;
-    public float PPM;
-    public short WORLD_UI = 0x0001;
+    Player player; //instance of player
+    Sprite ui_bg; //the UI interface
+    public World world; //physics and collision world
+    private Box2DDebugRenderer b2dr; //renderer that shows the bounding box of all bodies
+    public float PPM; // Pixel Per Meter
+    public short WORLD_UI = 0x0001; //the bit for which layer that the UI is located on
+    public Timeline timeline;
 
-    public PlayScreen(GodFractal game) {
+    public PlayScreen(GodFractal game) throws IOException {
         this.game = game;
         world = new World(new Vector2(0, 0), false); //sleep set to false since a lot of things are constantly happening
         b2dr = new Box2DDebugRenderer();
         videoPlayer = VideoPlayerCreator.createVideoPlayer();
         videoPlayer.setOnCompletionListener(new VideoPlayer.CompletionListener() {
             @Override
-            public void onCompletionListener(FileHandle file) {
+            public void onCompletionListener(FileHandle file) { //when the video is finished playing
                 try {
-                    videoPlayer.play(Gdx.files.internal("fractal.webm"));
+                    videoPlayer.play(Gdx.files.internal("fractal.webm"));  //try to loop the playback
                 } catch (FileNotFoundException e) {
-                    Gdx.app.error("gdx-video", "vid not found");
+                    Gdx.app.error("gdx-video", "vid not found"); //if the file somehow disappeared, uhhh nothing can be done really
                 }
             }
         });
         try {
-            videoPlayer.play(Gdx.files.internal("fractal.webm"));
+            videoPlayer.play(Gdx.files.internal("fractal.webm")); //try to play the video
         } catch (FileNotFoundException e) {
             Gdx.app.error("gdx-video", "vid not found");
         }
@@ -63,17 +65,17 @@ public class PlayScreen implements Screen {
 
 
         camera = new OrthographicCamera(); //fixed camera
-        camera.setToOrtho(false, game.VWidth / PPM, game.VHeight / PPM);
+        camera.setToOrtho(false, game.VWidth / PPM, game.VHeight / PPM); //set a camera with height and width matching with the world
 
         viewport = new FitViewport(game.VWidth / PPM, game.VHeight / PPM, camera); //a viewport with a fixed aspect ratio
 
-        camera.position.set(viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2, 0);
+        camera.position.set(viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2, 0); //set the position of the camera to the middle of the world
 
         game.batch.setProjectionMatrix(camera.combined);
 
-        UiCollisions();
+        UiCollisions(); //initialize the boundaries of the UI
 
-
+        timeline = new Timeline();
 
     }
 
@@ -84,11 +86,10 @@ public class PlayScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);  //set background to black
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        videoPlayer.update();
-        //camera.update();
+        videoPlayer.update(); // advance the frame of the video player
         update(delta);
         game.batch.begin();
 
@@ -99,10 +100,9 @@ public class PlayScreen implements Screen {
 
         player.Draw(game.batch, delta);
 
-        Array<Body> bodies = new Array<>();
+        Array<Body> bodies = new Array<>(); //array to contain all the bodies currently present in the world
         // Now fill the array with all bodies
         world.getBodies(bodies);
-
         for (Body b : bodies) {
             Sprite toDraw;
             BodyData data = (BodyData) b.getUserData();
@@ -116,10 +116,15 @@ public class PlayScreen implements Screen {
                                 toDraw.getWidth() / PPM, toDraw.getHeight() / PPM);
                     }
                 } else if (data.getType().equals("focusBullet")) {
-                    if (data.getProgress() >= 1 || Math.abs(b.getPosition().x) > viewport.getWorldWidth() * 3 || Math.abs(b.getPosition().y) > viewport.getWorldHeight() * 3){
+                    if (data.getProgress() >= 1 ||
+                            Math.abs(b.getPosition().x) > viewport.getWorldWidth() * 3 ||
+                            Math.abs(b.getPosition().y) > viewport.getWorldHeight() * 3 ||
+                            (Math.abs(b.getLinearVelocity().x) <= 0.01 && Math.abs(b.getLinearVelocity().y) <= 0.01 && data.getProgress() > 0.02)){
                         world.destroyBody(b);
+                        //System.out.println("velocity is " + b.getLinearVelocity().x + b.getLinearVelocity().y );
 
                     } else {
+
                         toDraw = data.getTexture();
                         b.setLinearVelocity(data.getVelocity(b.getPosition()));
                         data.addProgress(delta);
@@ -209,7 +214,5 @@ public class PlayScreen implements Screen {
         fdef.shape = shape;
         body = world.createBody(bdef);
         body.createFixture(fdef);
-        ;
-
     }
 }

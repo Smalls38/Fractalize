@@ -89,10 +89,11 @@ public class Player extends Entity {
 
         initializeBullet();
 
-        brot = new Mandelbrot(50, 0.5f, 0.5f, 874/PPM, 1044/PPM, new Vector2(222/PPM, 18/PPM), new Vector2(-1.5f, -1.1f));
+        //brot = new Mandelbrot(50, 0.5f, 0.5f, 874/PPM, 1044/PPM, new Vector2(222/PPM, 18/PPM), new Vector2(-1.5f, -1.1f));
+        brot = new Mandelbrot(30, 50, 1.5f, 1.5f, 874/PPM, 1044/PPM, new Vector2(222/PPM, 18/PPM), new Vector2(-1.5f, -1.1f));
         Vector2[] test = brot.mandlePoints(new ComplexNum(4.0625,4.0625));
         for (int i = 0; i < test.length; i++) {
-            System.out.println(test[i].x + " " + test[i].y);
+            //System.out.println(test[i].x + " " + test[i].y);
         }
     }
 
@@ -136,7 +137,7 @@ public class Player extends Entity {
             if (Gdx.input.isKeyPressed(Input.Keys.J)&& cooldowns.isOver(2)){
                 mandellingbrots.makeFractalBullet(screen, new CatmullRomSpline<>(brot.mandlePoints(new ComplexNum(body.getPosition().x, body.getPosition().y)), true), 0.2f);
                 for (int i = 0; i < (int) power; i++) {
-                    mandellingbrots.makeFractalBullet(screen, new CatmullRomSpline<>(brot.mandlePoints(new ComplexNum(Math.random()*10-5, Math.random()*10-5)), true), 0.1f);
+                    mandellingbrots.makeFractalBullet(screen, new CatmullRomSpline<>(brot.mandlePoints(new ComplexNum(Math.random()*38, Math.random()*38)), true), 0.1f);
                 }
             }
         } else {

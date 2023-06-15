@@ -10,6 +10,9 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.SnapshotArray;
 import com.god.fractal.Screens.PlayScreen;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 /**
  * i think i have to explain what the classes do now because there are a lot of classes for this project, this class is technically the main class?
  * it would hold and change all the screens but i might not have enough time for any of that
@@ -24,7 +27,11 @@ public class GodFractal extends Game {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		setScreen(new PlayScreen(this));
+		try {
+			setScreen(new PlayScreen(this));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
