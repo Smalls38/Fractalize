@@ -151,7 +151,7 @@ public class PlayScreen implements Screen {
             }
         }
 
-        //game.batch.draw(ui_bg, 0, 0, game.VWidth / game.PPM, game.VHeight / game.PPM);
+        game.batch.draw(ui_bg, 0, 0, game.VWidth / game.PPM, game.VHeight / game.PPM);
         game.batch.end();
 
         b2dr.render(world, camera.combined);

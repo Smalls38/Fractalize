@@ -4,6 +4,8 @@ import Entities.Entity;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -23,20 +25,29 @@ public class GodFractal extends Game {
 	public float PPM = 24; //pixel per meter
 	public float VWidth = 1920; //virtual width
 	public float VHeight = 1080; //virtual height
-	
+	public boolean disableScreen = false; //this just lets me do the path points in peace without all the sysouts
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		try {
-			setScreen(new PlayScreen(this));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		if (!disableScreen) {
+			try {
+				setScreen(new PlayScreen(this));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			batch.begin();
+			batch.draw( new Sprite(new Texture("ui_bg.png")), 0, 0, VWidth / PPM, VHeight / PPM);
+			batch.end();
 		}
 	}
 
 	@Override
 	public void render () {
 		ScreenUtils.clear(0, 0, 0, 1);
+//		batch.begin();
+//		batch.draw( new Sprite(new Texture("ui_bg.png")), 0, 0, VWidth, VHeight);
+//		batch.end();
 		update();
 		super.render(); //runs the current screen's render method with delta time passed into it
 	}
@@ -44,7 +55,7 @@ public class GodFractal extends Game {
 		//this just outputs the mouse position on the screen and outputs it to the console
 		//its like a very budget stage creator, this is for the points for the splines
 		if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
-			System.out.print(Gdx.input.getX()/PPM + " " + Gdx.input.getY()/PPM + ",");
+			System.out.print(Gdx.input.getX()/PPM + " " + ((1080/PPM)-(Gdx.input.getY()/PPM)) + ",");
 		} else if (Gdx.input.isKeyJustPressed(Input.Keys.N)){
 			System.out.println(); // new line if the n key is pressed
 		}

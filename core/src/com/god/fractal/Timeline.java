@@ -60,10 +60,10 @@ public class Timeline {
         ENEMY_WORLD = enemyLayer;
 
         StandardEnemy defect = new StandardEnemy(enemyLayer, playerLayer, BodyDef.BodyType.KinematicBody,
-                new Sprite(new Texture("assets/enemyDefect.png")), 0.05f, screen.PPM);
+                new Sprite(new Texture("assets/enemyDefect.png")), 0.1f, screen.PPM);
 
         StandardEnemy mutatedDefect = new StandardEnemy(enemyLayer, playerLayer, BodyDef.BodyType.KinematicBody,
-                new Sprite(new Texture("assets/enemyDefect.png")), 0.1f,screen.PPM );
+                new Sprite(new Texture("assets/enemyDefect.png")), 0.2f,screen.PPM );
 
         enemies = new HashMap<>(4);
         enemies.put("defect", defect);
@@ -88,6 +88,7 @@ public class Timeline {
         if (!timeline.isEmpty()) {
             curnode = timeline.peak();
             time -= delta;
+            System.out.println("dela and time is " + delta + " , " + time );
             if (time <= 0 && curnode.indefinite == false) {
                 endAndKill();
                 curnode = timeline.pop();
@@ -99,10 +100,16 @@ public class Timeline {
             }
         }
     }
+
+    /**
+     * ends the current node and time, this might seem useless but it prevents players from
+     * waiting for an eternity if they killed all enemies too fast
+     */
     public void end() {
-        if (!timeline.isEmpty()) {
+        if (!timeline.isEmpty() && time < 0 ) {
             curnode = timeline.pop();
             time = curnode.delta;
+            System.out.println("SPAWNING " + curnode.amount + " of enemies");
             for (int i = 0; i < curnode.amount; i++) {
                 curnode.enemy.makeEnemy(screen, paths[(int) (Math.random()*paths.length)]);
             }
