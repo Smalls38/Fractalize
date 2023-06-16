@@ -51,9 +51,11 @@ public class Timeline {
         ENEMY_WORLD = enemy;
 
         StandardEnemy defect = new StandardEnemy(enemy, );
+        StandardEnemy mutatedDefect = new StandardEnemy(enemy, );
 
         enemies = new HashMap<>(2);
-        enemies.put("", defect);
+        enemies.put("defect", defect);
+        enemies.put("mutatedDefect", mutatedDefect);
     }
 
     public void insertNode(float d, boolean i, Enemy e, int a) {

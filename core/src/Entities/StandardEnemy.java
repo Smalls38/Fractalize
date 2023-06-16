@@ -11,8 +11,7 @@ import com.god.fractal.Screens.PlayScreen;
 
 public class StandardEnemy extends Enemy {
 
-    public StandardEnemy(short enemy, short collisionLayer, BodyDef.BodyType type, Sprite img, Vector2[] dataSet, float speed, Vector2 spriteSize) {
-        CatmullRomSpline<Vector2> myCatmull = new CatmullRomSpline<Vector2>(dataSet, true);
+    public StandardEnemy(short enemy, short collisionLayer, BodyDef.BodyType type, Sprite img,  float speed, Vector2 spriteSize) {
         out = new Vector2();
         this.speed = speed;
 
@@ -31,6 +30,7 @@ public class StandardEnemy extends Enemy {
         fdef.shape = shape;
     }
     public void makeEnemy(Vector2 position, PlayScreen screen, float speed, CatmullRomSpline path) {
+
         Vector2 initialPosition = new Vector2();
         path.valueAt(initialPosition, 0);
         gdef.position.set(initialPosition);

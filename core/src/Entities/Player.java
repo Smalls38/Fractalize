@@ -42,6 +42,7 @@ public class Player extends Entity {
     public float PPM;
     public short PLAYER_WORLD = 0x0002;
     public short PLAYER_BULLETS = 0x0004;
+    public short ENEMY_WORLD;
     public float unfocusBulletCooldown = 0.05f;
     public float focusBulletCooldown = 0.15f;
     public float powerGainCooldown = 0.5f;
@@ -87,6 +88,8 @@ public class Player extends Entity {
         circle.dispose(); //removing the circle from memory
 
         initializeBullet();
+
+        ENEMY_WORLD = screen.ENEMY_WORLD;
 
         //brot = new Mandelbrot(50, 0.5f, 0.5f, 874/PPM, 1044/PPM, new Vector2(222/PPM, 18/PPM), new Vector2(-1.5f, -1.1f));
         brot = new Mandelbrot(30, 50, 1.5f, 1.5f, 874/PPM, 1044/PPM, new Vector2(222/PPM, 18/PPM), new Vector2(-1.5f, -1.1f));
