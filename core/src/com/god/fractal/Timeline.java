@@ -2,9 +2,12 @@ package com.god.fractal;
 
 import Entities.Enemy;
 import Entities.StandardEnemy;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.CatmullRomSpline;
 import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.god.fractal.Screens.PlayScreen;
 
 import java.io.BufferedReader;
@@ -14,18 +17,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.Float.parseFloat;
 
 public class Timeline {
     public float time;
+    //using stack for the nodes but just parsing them backwards, writing a queue takes more time than just having the stage
+    //file backwards
     public Stack<Node> timeline;
+
     public CatmullRomSpline<Vector2>[] paths;
     public HashMap<String, StandardEnemy> enemies;
     public short ENEMY_WORLD;
-
-    public Timeline(PlayScreen screen, short enemy) throws IOException {
+    public PlayScreen screen;
+    public Node curnode;
+    public Timeline(PlayScreen screen, short enemyLayer, short playerLayer) throws IOException {
         timeline = new Stack();
         time = 0;
+        this.screen = screen;
 
         BufferedReader reader = new BufferedReader(new FileReader("assets/points")); //read the possible points
         String tempLineRead;
@@ -44,50 +53,74 @@ public class Timeline {
                 System.out.println(" point parsed " + tempArray2[0] + ", " + tempArray2[1]);
             }
         }
-
+        paths = new CatmullRomSpline[P];
         for (int i = 0; i < P; i++) {
             paths[i] = new CatmullRomSpline<>(points[i].toArray(new Vector2[points[i].size()]), true);
         }
-        ENEMY_WORLD = enemy;
+        ENEMY_WORLD = enemyLayer;
 
-        StandardEnemy defect = new StandardEnemy(enemy, );
-        StandardEnemy mutatedDefect = new StandardEnemy(enemy, );
+        StandardEnemy defect = new StandardEnemy(enemyLayer, playerLayer, BodyDef.BodyType.KinematicBody,
+                new Sprite(new Texture("assets/enemyDefect.png")), 0.05f, screen.PPM);
 
-        enemies = new HashMap<>(2);
+        StandardEnemy mutatedDefect = new StandardEnemy(enemyLayer, playerLayer, BodyDef.BodyType.KinematicBody,
+                new Sprite(new Texture("assets/enemyDefect.png")), 0.1f,screen.PPM );
+
+        enemies = new HashMap<>(4);
         enemies.put("defect", defect);
         enemies.put("mutatedDefect", mutatedDefect);
+
+        reader = new BufferedReader(new FileReader("assets/stage1"));
+        int N = Integer.parseInt(reader.readLine());
+
+        for (int i = 0; i < N; i++) {
+            tempLineRead = reader.readLine();
+            tempArray = tempLineRead.split(" ");
+            insertNode(parseFloat(tempArray[0]), parseBoolean(tempArray[1]), enemies.get(tempArray[2]), Integer.parseInt(tempArray[3]));
+        }
+        //set curnode as first pop
     }
 
-    public void insertNode(float d, boolean i, Enemy e, int a) {
+    public void insertNode(float d, boolean i, StandardEnemy e, int a) {
         timeline.push(new Node(d, i, e, a));
     }
 
     public void update(float delta) {
         if (!timeline.isEmpty()) {
-            Node curnode = timeline.peak();
+            curnode = timeline.peak();
             time -= delta;
             if (time <= 0 && curnode.indefinite == false) {
+                endAndKill();
                 curnode = timeline.pop();
                 time = curnode.delta;
+                System.out.println("SPAWNING " + curnode.amount + " of enemies");
                 for (int i = 0; i < curnode.amount; i++) {
-
+                    curnode.enemy.makeEnemy(screen, paths[(int) (Math.random()*paths.length)]);
                 }
             }
         }
     }
-
     public void end() {
+        if (!timeline.isEmpty()) {
+            curnode = timeline.pop();
+            time = curnode.delta;
+            for (int i = 0; i < curnode.amount; i++) {
+                curnode.enemy.makeEnemy(screen, paths[(int) (Math.random()*paths.length)]);
+            }
+        }
 
+    }
+    public void endAndKill(){
+        screen.killAllEnemies();
     }
 }
 
 class Node {
     public float delta; //time required to pass until it automatically ends
     public boolean indefinite; // do the enemies have to be killed before the timeline can move on
-    public Enemy enemy; //type of enemy to spawn
+    public StandardEnemy enemy; //type of enemy to spawn
     public int amount; //amount of enemies
 
-    public Node(float d, boolean i, Enemy e, int a) {
+    public Node(float d, boolean i, StandardEnemy e, int a) {
         delta = d;
         indefinite = i;
         enemy = e;

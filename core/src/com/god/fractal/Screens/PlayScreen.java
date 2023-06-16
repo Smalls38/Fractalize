@@ -76,7 +76,7 @@ public class PlayScreen implements Screen {
 
         UiCollisions(); //initialize the boundaries of the UI
 
-        timeline = new Timeline(this, ENEMY_WORLD);
+        timeline = new Timeline(this, ENEMY_WORLD, player.PLAYER_WORLD);
 
     }
 
@@ -91,6 +91,7 @@ public class PlayScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         videoPlayer.update(); // advance the frame of the video player
+        timeline.update(delta); // update the timeline
         update(delta);
         game.batch.begin();
 
@@ -104,10 +105,21 @@ public class PlayScreen implements Screen {
         Array<Body> bodies = new Array<>(); //array to contain all the bodies currently present in the world
         // Now fill the array with all bodies
         world.getBodies(bodies);
+        int enemyCount = 0;
         for (Body b : bodies) {
             Sprite toDraw;
             BodyData data = (BodyData) b.getUserData();
             if (data != null) {
+                if (data.getType().equals("StandardEnemy") && data.getProgress() < 1){
+                    enemyCount++;
+                    toDraw = data.getTexture();
+                    b.setLinearVelocity(data.getVelocity(b.getPosition()));
+                    data.addProgress(delta);
+                    game.batch.draw(toDraw, b.getPosition().x - toDraw.getWidth() / 2 / PPM, b.getPosition().y - toDraw.getHeight() / 2 / PPM,
+                            toDraw.getWidth() / PPM, toDraw.getHeight() / PPM);
+                } else if (data.getProgress() >= 1){
+                    world.destroyBody(b);
+                }
                 if (data.getType().equals("unfocusBullet")) {
                     if (b.getPosition().y > viewport.getWorldHeight() * 1.2) {
                         world.destroyBody(b);
@@ -134,9 +146,12 @@ public class PlayScreen implements Screen {
                     }
                 }
             }
+            if (enemyCount == 0){
+                timeline.end();
+            }
         }
 
-        game.batch.draw(ui_bg, 0, 0, game.VWidth / game.PPM, game.VHeight / game.PPM);
+        //game.batch.draw(ui_bg, 0, 0, game.VWidth / game.PPM, game.VHeight / game.PPM);
         game.batch.end();
 
         b2dr.render(world, camera.combined);
@@ -153,20 +168,18 @@ public class PlayScreen implements Screen {
     public void resize(int width, int height) {
         viewport.update(width, height); //updates the actual size of the window so nothing can be stretched
     }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-
+    public void killAllEnemies(){
+        Array<Body> bodies = new Array<>(); //array to contain all the bodies currently present in the world
+        // Now fill the array with all bodies
+        world.getBodies(bodies);
+        for (Body b : bodies) {
+            BodyData data = (BodyData) b.getUserData();
+            if (data != null) {
+                if (data.getType().equals("StandardEnemy")) {
+                    world.destroyBody(b);
+                }
+            }
+        }
     }
 
     @Override
@@ -216,4 +229,20 @@ public class PlayScreen implements Screen {
         body = world.createBody(bdef);
         body.createFixture(fdef);
     }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
 }
+

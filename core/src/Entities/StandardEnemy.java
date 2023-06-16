@@ -11,12 +11,12 @@ import com.god.fractal.Screens.PlayScreen;
 
 public class StandardEnemy extends Enemy {
 
-    public StandardEnemy(short enemy, short collisionLayer, BodyDef.BodyType type, Sprite img,  float speed, Vector2 spriteSize) {
+    public StandardEnemy(short enemy, short collisionLayer, BodyDef.BodyType type, Sprite img, float speed, float PPM) {
         out = new Vector2();
         this.speed = speed;
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(spriteSize.x / 2, spriteSize.y / 2);
+        shape.setAsBox(img.getWidth()/ 2 /PPM, img.getHeight() / 2/PPM);
 
         gdef = new BodyDef();
         fdef = new FixtureDef();
@@ -24,12 +24,15 @@ public class StandardEnemy extends Enemy {
         gdef.type = type;
         gdef.fixedRotation = true;
         fdef.filter.categoryBits = collisionLayer;
-        imageSize = new Vector2(spriteSize.x, spriteSize.y);
+        imageSize = new Vector2(img.getWidth()/PPM, img.getHeight()/PPM);
 
         fdef.filter.maskBits = enemy;
         fdef.shape = shape;
+
+        name = "StandardEnemy";
     }
-    public void makeEnemy(Vector2 position, PlayScreen screen, float speed, CatmullRomSpline path) {
+
+    public void makeEnemy(PlayScreen screen, CatmullRomSpline path) {
 
         Vector2 initialPosition = new Vector2();
         path.valueAt(initialPosition, 0);
@@ -37,5 +40,8 @@ public class StandardEnemy extends Enemy {
         body = screen.world.createBody(gdef);
         body.setUserData(new BodyData("StandardEnemy", image, path, speed));
         body.createFixture(fdef);
+    }
+    public String getName() {
+        return name;
     }
 }

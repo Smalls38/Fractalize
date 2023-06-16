@@ -9,4 +9,5 @@ public abstract class Enemy extends Entity{
         float speed;
         float current;
         String name;
+        public abstract String getName();
 }
