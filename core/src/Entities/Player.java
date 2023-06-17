@@ -59,6 +59,7 @@ public class Player extends Entity {
 
         this.screen = screen;
         PPM = screen.game.PPM;
+        ENEMY_WORLD = screen.ENEMY_WORLD;
 
         //position of the sprite
         position = new Vector2(659 / PPM, 60 / PPM);
@@ -80,6 +81,8 @@ public class Player extends Entity {
         CircleShape circle = new CircleShape();
         circle.setRadius(hitboxRadius / PPM);
 
+
+        body.setUserData(new BodyData("player"));
         fdef = new FixtureDef();
         fdef.filter.categoryBits = PLAYER_WORLD;
         fdef.filter.maskBits = (short) (ENEMY_WORLD | WORLD_UI); // what bodies it will collide with
@@ -89,7 +92,7 @@ public class Player extends Entity {
 
         initializeBullet();
 
-        ENEMY_WORLD = screen.ENEMY_WORLD;
+
 
         //brot = new Mandelbrot(50, 0.5f, 0.5f, 874/PPM, 1044/PPM, new Vector2(222/PPM, 18/PPM), new Vector2(-1.5f, -1.1f));
         brot = new Mandelbrot(30, 50, 1.5f, 1.5f, 874/PPM, 1044/PPM, new Vector2(222/PPM, 18/PPM), new Vector2(-1.5f, -1.1f));

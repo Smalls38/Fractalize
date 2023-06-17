@@ -31,7 +31,7 @@ public class Timeline {
     public short ENEMY_WORLD;
     public PlayScreen screen;
     public Node curnode;
-    public Timeline(PlayScreen screen, short enemyLayer, short playerLayer) throws IOException {
+    public Timeline(PlayScreen screen, short enemyLayer, short playerLayer, short bulletLayer) throws IOException {
         timeline = new Stack();
         time = 0;
         this.screen = screen;
@@ -59,11 +59,11 @@ public class Timeline {
         }
         ENEMY_WORLD = enemyLayer;
 
-        StandardEnemy defect = new StandardEnemy(enemyLayer, playerLayer, BodyDef.BodyType.KinematicBody,
-                new Sprite(new Texture("assets/enemyDefect.png")), 0.1f, screen.PPM);
+        StandardEnemy defect = new StandardEnemy(enemyLayer, playerLayer, bulletLayer,
+                BodyDef.BodyType.KinematicBody, new Sprite(new Texture("assets/enemyDefect.png")), 0.1f, screen.PPM);
 
-        StandardEnemy mutatedDefect = new StandardEnemy(enemyLayer, playerLayer, BodyDef.BodyType.KinematicBody,
-                new Sprite(new Texture("assets/enemyDefect.png")), 0.2f,screen.PPM );
+        StandardEnemy mutatedDefect = new StandardEnemy(enemyLayer, playerLayer, bulletLayer,
+                BodyDef.BodyType.KinematicBody, new Sprite(new Texture("assets/enemyDefect.png")), 0.2f,screen.PPM );
 
         enemies = new HashMap<>(4);
         enemies.put("defect", defect);
@@ -88,7 +88,7 @@ public class Timeline {
         if (!timeline.isEmpty()) {
             curnode = timeline.peak();
             time -= delta;
-            System.out.println("dela and time is " + delta + " , " + time );
+            //System.out.println("delta and time is " + delta + " , " + time );
             if (time <= 0 && curnode.indefinite == false) {
                 endAndKill();
                 curnode = timeline.pop();

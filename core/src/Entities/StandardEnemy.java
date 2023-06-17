@@ -11,7 +11,7 @@ import com.god.fractal.Screens.PlayScreen;
 
 public class StandardEnemy extends Enemy {
 
-    public StandardEnemy(short enemy, short collisionLayer, BodyDef.BodyType type, Sprite img, float speed, float PPM) {
+    public StandardEnemy(short enemy, short playerCollisionLayer, short bulletCollisionLayer, BodyDef.BodyType type, Sprite img, float speed, float PPM) {
         out = new Vector2();
         this.speed = speed;
 
@@ -23,10 +23,10 @@ public class StandardEnemy extends Enemy {
         image = img;
         gdef.type = type;
         gdef.fixedRotation = true;
-        fdef.filter.categoryBits = collisionLayer;
+        fdef.filter.categoryBits = enemy;
         imageSize = new Vector2(img.getWidth()/PPM, img.getHeight()/PPM);
 
-        fdef.filter.maskBits = enemy;
+        fdef.filter.maskBits = (short) (playerCollisionLayer | bulletCollisionLayer);
         fdef.shape = shape;
 
         name = "StandardEnemy";

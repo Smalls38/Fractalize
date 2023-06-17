@@ -20,6 +20,9 @@ public class BodyData {
         type = ty;
         texture = te;
     }
+    public BodyData(String ty){
+        type = ty;
+    }
     public BodyData(String ty, Sprite te, CatmullRomSpline<Vector2> path, float s ){
         type = ty;
         texture = te;
