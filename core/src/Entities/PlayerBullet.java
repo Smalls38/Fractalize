@@ -10,9 +10,8 @@ import com.god.fractal.Screens.PlayScreen;
 import com.god.fractal.BodyData;
 
 public class PlayerBullet extends Bullet implements Projectile{
-    public PlayerBullet(short enemy, short collisionLayer, BodyDef.BodyType type, Sprite img, Vector2 spriteSize, float damage, float lifetime){
+    public PlayerBullet(short collisionLayer, BodyDef.BodyType type, Sprite img, Vector2 spriteSize, float damage){
         this.dmg = damage;
-        this.lifeTime =  lifetime;
 
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(spriteSize.x/2, spriteSize.y/2);
@@ -25,20 +24,20 @@ public class PlayerBullet extends Bullet implements Projectile{
         fdef.filter.categoryBits = collisionLayer;
         imageSize = new Vector2(spriteSize.x, spriteSize.y);
 
-        fdef.filter.maskBits = enemy;
+        System.out.println(fdef.filter.maskBits);
         fdef.shape = shape;
     }
     public void makeBullet(Vector2 position, PlayScreen screen, float speed){
         gdef.position.set(position);
         body = screen.world.createBody(gdef);
-        body.setUserData(new BodyData("unfocusBullet", image));
+        body.setUserData(new BodyData("unfocusBullet", image, 1, dmg));
         body.createFixture(fdef);
         body.setLinearVelocity(0,speed);
     }
     public void makeBullet(Vector2 position, PlayScreen screen, Vector2 speed){
         gdef.position.set(position);
         body = screen.world.createBody(gdef);
-        body.setUserData(new BodyData("unfocusBullet", image));
+        body.setUserData(new BodyData("unfocusBullet", image, 1, dmg));
         body.createFixture(fdef);
         body.setLinearVelocity(speed.x,speed.y);
     }
@@ -47,7 +46,7 @@ public class PlayerBullet extends Bullet implements Projectile{
         path.valueAt(initialPosition, 0);
         gdef.position.set(initialPosition);
         body = screen.world.createBody(gdef);
-        body.setUserData(new BodyData("focusBullet", image, path, speed));
+        body.setUserData(new BodyData("focusBullet", image, path, speed, 1 , dmg));
         body.createFixture(fdef);
 
     }

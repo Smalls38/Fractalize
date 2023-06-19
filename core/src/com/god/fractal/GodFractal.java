@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.SnapshotArray;
+import com.god.fractal.Screens.GameOverScreen;
 import com.god.fractal.Screens.PlayScreen;
 
 import java.io.FileNotFoundException;
@@ -58,11 +59,16 @@ public class GodFractal extends Game {
 			System.out.print(Gdx.input.getX()/PPM + " " + ((1080/PPM)-(Gdx.input.getY()/PPM)) + ",");
 		} else if (Gdx.input.isKeyJustPressed(Input.Keys.N)){
 			System.out.println(); // new line if the n key is pressed
+		} else if (Gdx.input.isKeyJustPressed(Input.Keys.R)){
+
 		}
 	}
 	
 	@Override
 	public void dispose () {
 		batch.dispose();
+	}
+	public void gameOver(){
+		setScreen(new GameOverScreen());
 	}
 }

@@ -2,6 +2,7 @@ package Entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -40,26 +41,36 @@ public class Player extends Entity {
 
     public PlayScreen screen;
     public float PPM;
-    public short PLAYER_WORLD = 0x0002;
-    public short PLAYER_BULLETS = 0x0004;
+    public short PLAYER_WORLD;
+    public short PLAYER_BULLETS;
     public short ENEMY_WORLD;
     public float unfocusBulletCooldown = 0.05f;
     public float focusBulletCooldown = 0.15f;
     public float powerGainCooldown = 0.5f;
-    public Cooldown cooldowns = new Cooldown(new float[]{unfocusBulletCooldown, powerGainCooldown, focusBulletCooldown});
+    public float invincibilityDuration = 1;
+    public float bulletSfxCooldown = 1;
+    public Cooldown cooldowns = new Cooldown(new float[]{unfocusBulletCooldown, powerGainCooldown, focusBulletCooldown,
+            invincibilityDuration, bulletSfxCooldown});
     Texture swordTexture = new Texture("swordPhantom.png");
     Texture blossomTexture = new Texture("blossom.png");
     Texture mandelTexture = new Texture("fractalBullet.png");
+    Sprite invincibilityPlayer = new Sprite(new Texture("player1_immune.png"));
+    Sprite currentPlayer;
     Mandelbrot brot;
+    Sound blossomSound = Gdx.audio.newSound(Gdx.files.internal("assets/blossom_sfx.mp3"));
+    Sound fractalSound = Gdx.audio.newSound(Gdx.files.internal("assets/fractal_sfx.mp3"));
 
     public Player(Texture img, Texture img2, PlayScreen screen, short WORLD_UI) {
         image = new Sprite(img);
         hitbox = new Sprite(img2);
         health = 100;
-
+        currentPlayer = image;
         this.screen = screen;
         PPM = screen.game.PPM;
+        PLAYER_WORLD = screen.PLAYER_WORLD;
+        PLAYER_BULLETS = screen.PLAYER_BULLETS;
         ENEMY_WORLD = screen.ENEMY_WORLD;
+
 
         //position of the sprite
         position = new Vector2(659 / PPM, 60 / PPM);
@@ -85,7 +96,8 @@ public class Player extends Entity {
         body.setUserData(new BodyData("player"));
         fdef = new FixtureDef();
         fdef.filter.categoryBits = PLAYER_WORLD;
-        fdef.filter.maskBits = (short) (ENEMY_WORLD | WORLD_UI); // what bodies it will collide with
+
+
         fdef.shape = circle;
         body.createFixture(fdef);
         circle.dispose(); //removing the circle from memory
@@ -103,6 +115,9 @@ public class Player extends Entity {
     }
 
     public void Update(float delta) {
+        if (health <= 0){
+            screen.game.gameOver();
+        }
         cooldowns.update(delta);
         velocity = new Vector2(0, 0);
         if (cooldowns.isOver(1) && power <= 3) {
@@ -123,6 +138,9 @@ public class Player extends Entity {
         if (Gdx.input.isKeyPressed(Input.Keys.J) && cooldowns.isOver(0)) {
             if (!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
                 if (power >= 1) {
+                    if (cooldowns.isOver(4)) {
+                        blossomSound.play(0.4f);
+                    }
                     blossoms.makeBullet(new Vector2(body.getPosition().x, body.getPosition().y + imageSize.y), screen, new Vector2(0, bulletVelocity_blossoms));
                 }
                 if (power >= 2) {
@@ -140,6 +158,9 @@ public class Player extends Entity {
             focus = true;
             speed = maxSpeed / 2;
             if (Gdx.input.isKeyPressed(Input.Keys.J)&& cooldowns.isOver(2)){
+                if (cooldowns.isOver(4)) {
+                    fractalSound.play(0.2f);
+                }
                 mandellingbrots.makeFractalBullet(screen, new CatmullRomSpline<>(brot.mandlePoints(new ComplexNum(body.getPosition().x, body.getPosition().y)), true), 0.2f);
                 for (int i = 0; i < (int) power; i++) {
                     mandellingbrots.makeFractalBullet(screen, new CatmullRomSpline<>(brot.mandlePoints(new ComplexNum(Math.random()*38, Math.random()*38)), true), 0.1f);
@@ -150,13 +171,18 @@ public class Player extends Entity {
             speed = maxSpeed;
         }
         body.setLinearVelocity(speed * velocity.x, speed * velocity.y);
+
+        if(cooldowns.isOverCheckOnly(3) && invincibility){
+            invincibility = false;
+            currentPlayer = image;
+        }
     }
 
     public void Draw(SpriteBatch batch, float delta) {
         Update(delta);
 
         //System.out.println("player is at " + body.getPosition().y + "," + body.getPosition().y);
-        batch.draw(image, body.getPosition().x - imageSize.x / 2, body.getPosition().y - imageSize.y / 2, imageSize.x, imageSize.y);
+        batch.draw(currentPlayer, body.getPosition().x - imageSize.x / 2, body.getPosition().y - imageSize.y / 2, imageSize.x, imageSize.y);
 
         if (focus) {
             batch.draw(hitbox, body.getPosition().x - hitboxSize.x / 2, body.getPosition().y - hitboxSize.y / 2, hitboxSize.x, hitboxSize.y);
@@ -164,10 +190,18 @@ public class Player extends Entity {
     }
 
     public void initializeBullet() {
-        swordPhantoms = new PlayerBullet(ENEMY_WORLD, PLAYER_BULLETS, BodyDef.BodyType.KinematicBody, new Sprite(swordTexture), new Vector2(swordTexture.getWidth() / PPM, swordTexture.getHeight() / PPM), 50, 100);
-        blossoms = new PlayerBullet(ENEMY_WORLD, PLAYER_BULLETS, BodyDef.BodyType.KinematicBody, new Sprite(blossomTexture), new Vector2(blossomTexture.getWidth() / PPM, blossomTexture.getHeight() / PPM), 25, 150);
-        mandellingbrots = new PlayerBullet(ENEMY_WORLD, PLAYER_BULLETS, BodyDef.BodyType.KinematicBody, new Sprite(mandelTexture), new Vector2(mandelTexture.getWidth() / PPM, mandelTexture.getHeight() / PPM), 10, 50);
+        swordPhantoms = new PlayerBullet( PLAYER_BULLETS, BodyDef.BodyType.KinematicBody, new Sprite(swordTexture), new Vector2(swordTexture.getWidth() / PPM, swordTexture.getHeight() / PPM), 38);
+        blossoms = new PlayerBullet( PLAYER_BULLETS, BodyDef.BodyType.KinematicBody, new Sprite(blossomTexture), new Vector2(blossomTexture.getWidth() / PPM, blossomTexture.getHeight() / PPM), 10);
+        mandellingbrots = new PlayerBullet(PLAYER_BULLETS, BodyDef.BodyType.KinematicBody, new Sprite(mandelTexture), new Vector2(mandelTexture.getWidth() / PPM, mandelTexture.getHeight() / PPM), 38);
     }
 
+    public void immunity(){
+        //if the player can enter immunity
+        if(cooldowns.isOver(3)){
+            invincibility = true;
+            System.out.println("immunity granted");
+            currentPlayer = invincibilityPlayer;
+        }
+    }
 
 }

@@ -22,9 +22,18 @@ public class Cooldown {
         }
         return false;
     }
+    public boolean isOverCheckOnly(int index){
+        if (timers[index] < 0){
+            return true;
+        }
+        return false;
+    }
     public void update(float delta){
         for (int i = 0; i < timers.length; i++) {
             timers[i] = timers[i]-delta;
         }
+    }
+    public float get(int index){
+        return timers[index];
     }
 }

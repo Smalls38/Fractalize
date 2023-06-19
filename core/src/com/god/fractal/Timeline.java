@@ -1,6 +1,7 @@
 package com.god.fractal;
 
 import Entities.Enemy;
+import Entities.EnemyBullet;
 import Entities.StandardEnemy;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -31,7 +32,7 @@ public class Timeline {
     public short ENEMY_WORLD;
     public PlayScreen screen;
     public Node curnode;
-    public Timeline(PlayScreen screen, short enemyLayer, short playerLayer, short bulletLayer) throws IOException {
+    public Timeline(PlayScreen screen, short enemyLayer, short bulletLayer) throws IOException {
         timeline = new Stack();
         time = 0;
         this.screen = screen;
@@ -59,11 +60,15 @@ public class Timeline {
         }
         ENEMY_WORLD = enemyLayer;
 
-        StandardEnemy defect = new StandardEnemy(enemyLayer, playerLayer, bulletLayer,
-                BodyDef.BodyType.KinematicBody, new Sprite(new Texture("assets/enemyDefect.png")), 0.1f, screen.PPM);
+        Sprite bulletSprite = new Sprite(new Texture("assets/enemyBullet.png"));
+        EnemyBullet defectBullet = new EnemyBullet (bulletLayer, BodyDef.BodyType.KinematicBody, bulletSprite,
+                new Vector2(bulletSprite.getWidth(), bulletSprite.getHeight()), 8f, 10f);
 
-        StandardEnemy mutatedDefect = new StandardEnemy(enemyLayer, playerLayer, bulletLayer,
-                BodyDef.BodyType.KinematicBody, new Sprite(new Texture("assets/enemyDefect.png")), 0.2f,screen.PPM );
+        StandardEnemy defect = new StandardEnemy(enemyLayer, 0.5f,
+                BodyDef.BodyType.DynamicBody, new Sprite(new Texture("assets/enemyDefect.png")), 0.1f, screen.PPM, 300, 30, defectBullet);
+
+        StandardEnemy mutatedDefect = new StandardEnemy(enemyLayer, 0.2f,
+                BodyDef.BodyType.DynamicBody, new Sprite(new Texture("assets/enemyDefect.png")), 0.2f,screen.PPM, 200, 50, defectBullet);
 
         enemies = new HashMap<>(4);
         enemies.put("defect", defect);

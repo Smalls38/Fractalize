@@ -10,7 +10,6 @@ public abstract class Entity {
     public Vector2 position; // Using a vector class to represent the position of the entity, it's just for convenience’s sake.
     public Sprite image; //the displayed sprite of the entity
     public Vector2 imageSize;
-    public boolean permanent;  //if the entity disappears after animationTime permanent
     public Body body; //
     public BodyDef gdef; //type of body
     public FixtureDef fdef;
