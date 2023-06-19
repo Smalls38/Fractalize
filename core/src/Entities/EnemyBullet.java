@@ -11,18 +11,18 @@ import com.god.fractal.Screens.PlayScreen;
 
 public class EnemyBullet extends Bullet implements Projectile {
     float bulletSpeed;
-    public EnemyBullet(short collisionLayer, BodyDef.BodyType type, Sprite img, Vector2 spriteSize,
+    public EnemyBullet(short collisionLayer, BodyDef.BodyType type, Sprite img, Vector2 spriteSize, float PPM,
                        float damage, float bulletSpeed){
         this.dmg = damage;
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(spriteSize.x/2, spriteSize.y/2);
+        shape.setAsBox(spriteSize.x/2/PPM, spriteSize.y/2/PPM);
 
         gdef = new BodyDef();
         fdef = new FixtureDef();
         image = img;
         gdef.type = type;
-        gdef.fixedRotation = true;
+        gdef.fixedRotation = false;
         fdef.filter.categoryBits = collisionLayer;
         imageSize = new Vector2(spriteSize.x, spriteSize.y);
 

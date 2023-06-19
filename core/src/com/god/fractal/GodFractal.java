@@ -27,18 +27,22 @@ public class GodFractal extends Game {
 	public float VWidth = 1920; //virtual width
 	public float VHeight = 1080; //virtual height
 	public boolean disableScreen = false; //this just lets me do the path points in peace without all the sysouts
+	public boolean gameOver = false; // whether this is a game over screen or not
+	public PlayScreen playScreen;
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 		if (!disableScreen) {
 			try {
-				setScreen(new PlayScreen(this));
+				playScreen = new PlayScreen(this);
+				setScreen(playScreen);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
+
 		} else {
 			batch.begin();
-			batch.draw( new Sprite(new Texture("ui_bg.png")), 0, 0, VWidth / PPM, VHeight / PPM);
+			//batch.draw( new Sprite(new Texture("ui_bg.png")), 0, 0, VWidth / PPM, VHeight / PPM);
 			batch.end();
 		}
 	}
@@ -46,9 +50,6 @@ public class GodFractal extends Game {
 	@Override
 	public void render () {
 		ScreenUtils.clear(0, 0, 0, 1);
-//		batch.begin();
-//		batch.draw( new Sprite(new Texture("ui_bg.png")), 0, 0, VWidth, VHeight);
-//		batch.end();
 		update();
 		super.render(); //runs the current screen's render method with delta time passed into it
 	}
@@ -59,8 +60,16 @@ public class GodFractal extends Game {
 			System.out.print(Gdx.input.getX()/PPM + " " + ((1080/PPM)-(Gdx.input.getY()/PPM)) + ",");
 		} else if (Gdx.input.isKeyJustPressed(Input.Keys.N)){
 			System.out.println(); // new line if the n key is pressed
-		} else if (Gdx.input.isKeyJustPressed(Input.Keys.R)){
-
+		} else if (Gdx.input.isKeyJustPressed(Input.Keys.R) && gameOver){
+			dispose();
+			batch = new SpriteBatch();
+			gameOver = false;
+			try {
+				playScreen = new PlayScreen(this);
+				setScreen(playScreen);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 	
@@ -69,6 +78,9 @@ public class GodFractal extends Game {
 		batch.dispose();
 	}
 	public void gameOver(){
-		setScreen(new GameOverScreen());
+		playScreen.gameOver = true;
+		System.out.println("BRUH");
+		setScreen(new GameOverScreen(this));
+		gameOver = true;
 	}
 }

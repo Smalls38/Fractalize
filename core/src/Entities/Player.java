@@ -35,10 +35,7 @@ public class Player extends Entity {
     public float speed = 0; //speed of player
     public float power = 0; //power of player, more bullets will exist if player has higher power
     public boolean invincibility = false; //when player is not affacted by any collisions
-    public boolean dead = false; //when player is dead
     public boolean focus = false;
-    public ArrayList<PlayerBullet> bullets = new ArrayList<>();
-
     public PlayScreen screen;
     public float PPM;
     public short PLAYER_WORLD;
@@ -121,7 +118,7 @@ public class Player extends Entity {
         cooldowns.update(delta);
         velocity = new Vector2(0, 0);
         if (cooldowns.isOver(1) && power <= 3) {
-            power += 0.1;
+            power += 0.01;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             velocity.y += 1;

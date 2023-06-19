@@ -62,7 +62,7 @@ public class Timeline {
 
         Sprite bulletSprite = new Sprite(new Texture("assets/enemyBullet.png"));
         EnemyBullet defectBullet = new EnemyBullet (bulletLayer, BodyDef.BodyType.KinematicBody, bulletSprite,
-                new Vector2(bulletSprite.getWidth(), bulletSprite.getHeight()), 8f, 10f);
+                new Vector2(bulletSprite.getWidth(), bulletSprite.getHeight()), screen.PPM, 8f, 10f);
 
         StandardEnemy defect = new StandardEnemy(enemyLayer, 0.5f,
                 BodyDef.BodyType.DynamicBody, new Sprite(new Texture("assets/enemyDefect.png")), 0.1f, screen.PPM, 300, 30, defectBullet);

@@ -42,6 +42,7 @@ public class PlayScreen implements Screen {
     public short ENEMY_WORLD = 0x0008;
     public short ENEMY_BULLETS = 0x0010;
     public Timeline timeline;
+    public boolean gameOver = false;
     Music music = Gdx.audio.newMusic(Gdx.files.internal("assets/stage1_ost.mp3"));
 
 
@@ -105,9 +106,6 @@ public class PlayScreen implements Screen {
                 BodyData dataB = (BodyData) contact.getFixtureB().getBody().getUserData();
                 int orResult = firstBit | secondBit;
                 if ((orResult) == (ENEMY_WORLD | PLAYER_WORLD)) {
-                    System.out.println("Contact " + firstBit + " " + secondBit);
-                    System.out.println(ENEMY_WORLD | PLAYER_WORLD);
-                    contact.setEnabled(false);
                     if (dataA != null) {
                         totalDamage += dataA.getDamage();
                     } else {
@@ -115,7 +113,19 @@ public class PlayScreen implements Screen {
                     }
                     contact.setEnabled(false);
 
-                } else if ((orResult) == (ENEMY_WORLD | WORLD_UI)){
+                } else if ((orResult) == (ENEMY_BULLETS | PLAYER_WORLD)){
+                    if (dataA != null) {
+                        totalDamage += dataA.getDamage();
+                        dataA.takeDamage(99999f);
+                    } else {
+                        totalDamage += dataB.getDamage();
+                        dataB.takeDamage(99999f);
+                    }
+                    contact.setEnabled(false);
+                }else if ((orResult) == (ENEMY_WORLD | WORLD_UI) ||
+                        (orResult) == (ENEMY_WORLD) ||
+                        (orResult) == (PLAYER_BULLETS | PLAYER_WORLD) ||
+                        (orResult) == (ENEMY_BULLETS | ENEMY_WORLD)){
                     contact.setEnabled(false);
                 } else if ((orResult) == (PLAYER_BULLETS | WORLD_UI)){
                     System.out.println("Contact " + firstBit + " " + secondBit);
@@ -123,10 +133,6 @@ public class PlayScreen implements Screen {
                 } else if ((orResult) == (PLAYER_BULLETS | ENEMY_WORLD)){
                     dataA.takeDamage(dataB.getDamage());
                     dataB.takeDamage(dataA.getDamage());
-                    contact.setEnabled(false);
-                } else if ((orResult) == (ENEMY_WORLD | ENEMY_WORLD)){
-                    contact.setEnabled(false);
-                } else if ((orResult) == (PLAYER_BULLETS | PLAYER_WORLD)){
                     contact.setEnabled(false);
                 }
                 if (!player.invincibility){
@@ -181,15 +187,13 @@ public class PlayScreen implements Screen {
                         //the bullet will be aimed at a random direction or at the player with 50/50 chances
                         if (data.getTimer().isOver(0)) {
                             System.out.println("enemy tried to shoot");
-                            if (Math.random() > 0.5) {
+                            if (Math.random() > 0.2) {
                                 data.getBulletType().makeBullet(b.getPosition(), this,
-                                        new Vector2((float) Math.random(), (float) Math.random()));
+                                        new Vector2((float) Math.random()-1, (float) Math.random()-1));
                             } else {
                                 data.getBulletType().makeBullet(b.getPosition(), this,
                                         player.body.getPosition().sub(b.getPosition()));
                             }
-                        } else {
-                            System.out.println(data.getTimer().get(0));
                         }
                         toDraw = data.getTexture();
                         b.setLinearVelocity(data.getVelocity(b.getPosition()));
@@ -214,7 +218,6 @@ public class PlayScreen implements Screen {
                             (Math.abs(b.getLinearVelocity().x) <= 0.01 && Math.abs(b.getLinearVelocity().y) <= 0.01 && data.getProgress() > 0.02) ||
                             data.getHealth() <= 0){
                         world.destroyBody(b);
-                        //System.out.println("velocity is " + b.getLinearVelocity().x + b.getLinearVelocity().y );
 
                     } else {
                         toDraw = data.getTexture();
@@ -225,7 +228,7 @@ public class PlayScreen implements Screen {
                     }
                 } else if (data.getType().equals("enemyBullet")){
                     if (b.getPosition().x < 0 || b.getPosition().x > viewport.getWorldWidth() ||b.getPosition().y < 0 ||
-                            b.getPosition().y > viewport.getWorldHeight()){
+                            b.getPosition().y > viewport.getWorldHeight() || data.getHealth() <= 0){
                         world.destroyBody(b);
                     } else {
                         toDraw = data.getTexture();
@@ -243,7 +246,10 @@ public class PlayScreen implements Screen {
         game.batch.draw(ui_health, 105/PPM, 114/PPM, ui_health.getWidth()/ PPM, ui_health.getHeight() / game.PPM * (Math.max(0, player.health)/100));
         game.batch.end();
 
-        b2dr.render(world, camera.combined);
+        //b2dr.render(world, camera.combined);
+        if (gameOver){
+            dispose();
+        }
 
 
     }
@@ -273,6 +279,7 @@ public class PlayScreen implements Screen {
 
     @Override
     public void dispose() {
+        music.dispose();
         world.dispose();
         b2dr.dispose();
 
