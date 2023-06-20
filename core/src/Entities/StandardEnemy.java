@@ -39,7 +39,6 @@ public class StandardEnemy extends Enemy {
         cooldowns = new Cooldown(new float[]{bulletCooldown});
 
         this.bullet = bullet;
-        shape.dispose();
     }
 
     public void makeEnemy(PlayScreen screen, CatmullRomSpline path) {

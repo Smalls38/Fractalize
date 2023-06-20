@@ -345,6 +345,7 @@ just a bunch of code to code the bounds of the ui, its magic numbers that cuz th
         body.createFixture(fdef);
     }
     public void draw(Sprite toDraw, Body b){
+        System.out.println("BUH");
         game.batch.draw(toDraw, b.getPosition().x - toDraw.getWidth() / 2 / PPM, b.getPosition().y - toDraw.getHeight() / 2 / PPM,
                 toDraw.getWidth() / PPM, toDraw.getHeight() / PPM);
     }
