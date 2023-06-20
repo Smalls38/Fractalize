@@ -1,5 +1,9 @@
 package com.god.fractal;
 
+/**
+ * complex number class i had to write for the fractals n stuff
+ * its hella barebones since i only wrote the part i need for mandelbrot
+ */
 public class ComplexNum {
     public final double real;
     public final double imagine;

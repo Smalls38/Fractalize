@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 
 /**
  * class object to store every information needed for a body to be drawn and move n all
+ * since the data will be identified and some datas dont exists for some types, it will just be null and it will be fine
  */
 
 public class BodyData {

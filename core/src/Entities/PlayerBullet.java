@@ -24,8 +24,8 @@ public class PlayerBullet extends Bullet implements Projectile{
         fdef.filter.categoryBits = collisionLayer;
         imageSize = new Vector2(spriteSize.x, spriteSize.y);
 
-        System.out.println(fdef.filter.maskBits);
         fdef.shape = shape;
+        shape.dispose();
     }
     public void makeBullet(Vector2 position, PlayScreen screen, float speed){
         gdef.position.set(position);

@@ -29,6 +29,7 @@ public class EnemyBullet extends Bullet implements Projectile {
         System.out.println(fdef.filter.maskBits);
         fdef.shape = shape;
         this.bulletSpeed = bulletSpeed;
+        shape.dispose();
     }
 
     public void makeBullet(Vector2 position, PlayScreen screen, float speed) {

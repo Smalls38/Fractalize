@@ -40,7 +40,7 @@ public class Mandelbrot {
         return result;
     }
     public void calculate(ComplexNum z, ComplexNum z0, ArrayList<Vector2> points, int steps){
-        if (steps != maxIterations && z.abs() < maxDistance) { //if the point is not iterating beyond the max
+        if (steps != maxIterations && z.abs() < maxDistance) { //if the point is not iterating beyond the max and not too far
             steps++; //increment the point
             z = z.times(z); // do the mandelbrot :emoji of my head exploding from the sheer amount of information:
             z = z.plus(z0);
