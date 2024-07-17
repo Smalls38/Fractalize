@@ -25,7 +25,6 @@ public class PlayerBullet extends Bullet implements Projectile{
         imageSize = new Vector2(spriteSize.x, spriteSize.y);
 
         fdef.shape = shape;
-        shape.dispose();
     }
     public void makeBullet(Vector2 position, PlayScreen screen, float speed){
         gdef.position.set(position);

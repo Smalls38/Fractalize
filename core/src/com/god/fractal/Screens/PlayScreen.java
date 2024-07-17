@@ -264,7 +264,7 @@ public class PlayScreen implements Screen {
         game.batch.end();
 
         //commented this out but it draws the bounds
-        //b2dr.render(world, camera.combined);
+        b2dr.render(world, camera.combined);
 
         if (gameOver){
             dispose();
